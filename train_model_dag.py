@@ -1,7 +1,9 @@
+import subprocess
+
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
-import subprocess
+
 
 def run_training_script():
     subprocess.run(['python', '/opt/airflow/dags/train_model.py'])
