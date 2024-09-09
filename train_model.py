@@ -4,6 +4,8 @@ from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
+mlflow.set_tracking_uri("http://localhost:5000") 
+
 # Create dataset
 X, y = make_regression(n_samples=100, n_features=1, noise=0.1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
