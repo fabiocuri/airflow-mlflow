@@ -1,11 +1,28 @@
 #!/bin/bash
 
+# Create k8s cluster
+
+set -e
+
+sudo apt install docker.io
+
+snap install kubectl --classic
+
+[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-amd64
+[ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-arm64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+
+ip_addresses=$(hostname -I)
+export MY_IP_ADDRESS=$(echo "$ip_addresses" | awk '{print $1}')
+kind delete cluster --name kind
+envsubst < cluster.yaml | kind create cluster --retain --config=-
+kubectl cluster-info --context kind-kind
+
 # Install Apache Airflow
 
 helm repo add apache-airflow https://airflow.apache.org
-
 helm repo update
-
 kubectl create namespace airflow
 
 helm install airflow apache-airflow/airflow \
@@ -19,9 +36,7 @@ kubectl port-forward svc/airflow-webserver 8080:8080 --namespace airflow &
 # Install MLFlow
 
 helm repo add community-charts https://community-charts.github.io/helm-charts
-
 helm repo update
-
 kubectl create namespace mlflow
 
 helm install mlflow community-charts/mlflow
